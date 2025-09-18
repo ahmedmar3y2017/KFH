@@ -1,6 +1,8 @@
 package com.kfh.dtos;
 
 import lombok.*;
+
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -15,5 +17,7 @@ public class StudentDto {
     private String email;
     private String telephone;
     private String address;
-    private Set<StudentCourseDto> enrollments;
+//    private Set<StudentCourseDto> enrollments;
+
+    private List<CourseDto> courses;
 }
