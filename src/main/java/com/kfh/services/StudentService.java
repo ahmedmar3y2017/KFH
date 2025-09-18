@@ -27,4 +27,10 @@ public class StudentService {
         Student saved = studentRepository.save(student);
         return studentMapper.toDto(saved);
     }
+
+    public void deleteStudent(long studentId) {
+        if (studentRepository.existsById(studentId)) {
+            studentRepository.deleteById(studentId);
+        }
+    }
 }

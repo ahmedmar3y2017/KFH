@@ -4,9 +4,8 @@ import com.kfh.dtos.CourseDto;
 import com.kfh.dtos.StudentDto;
 import com.kfh.services.StudentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -22,5 +21,11 @@ public class StudentController {
     @GetMapping
     public List<StudentDto> getAllStudents() {
         return studentService.getAllStudents();
+    }
+
+    @DeleteMapping("/{studentId}")
+    public ResponseEntity<String> delete(@PathVariable("studentId") long studentId) {
+        studentService.deleteStudent(studentId);
+        return ResponseEntity.ok("");
     }
 }
