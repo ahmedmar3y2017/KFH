@@ -1,5 +1,7 @@
 package com.kfh.security;
 
+import com.kfh.exception.JwtAccessDeniedHandler;
+import com.kfh.exception.JwtAuthEntryPoint;
 import com.kfh.services.StudentDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.*;
@@ -17,6 +19,8 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final StudentDetailsService studentDetailsService;
+    private final JwtAuthEntryPoint jwtAuthEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -26,6 +30,12 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**", "/h2-console/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated()
                 )
+
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(jwtAuthEntryPoint)
+                        .accessDeniedHandler(jwtAccessDeniedHandler)
+                )
+
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationManager(authenticationManager(http.getSharedObject(AuthenticationConfiguration.class)));
 
