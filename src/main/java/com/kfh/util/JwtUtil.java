@@ -1,0 +1,60 @@
+package com.kfh.util;
+
+import com.kfh.security.StudentDetails;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
+
+import java.security.Key;
+import java.util.*;
+import java.util.Date;
+
+@Component
+public class JwtUtil {
+
+    private final Key key;
+    private final long jwtExpirationMs;
+
+    public JwtUtil(@Value("${app.jwt.secret}") String secret,
+                   @Value("${app.jwt.expiration-ms:3600000}") long jwtExpirationMs) {
+        this.key = Keys.hmacShaKeyFor(Base64.getDecoder().decode(secret));
+        this.jwtExpirationMs = jwtExpirationMs;
+    }
+
+    public String generateToken(StudentDetails userDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("role", userDetails.getAuthorities().stream().findFirst().map(Object::toString).orElse("ROLE_STUDENT"));
+        claims.put("studentId", userDetails.getStudentId());
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public boolean validateToken(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+
+    public String extractUsername(String token) {
+        return getClaims(token).getSubject();
+    }
+
+    private boolean isTokenExpired(String token) {
+        Date expiration = getClaims(token).getExpiration();
+        return expiration.before(new Date());
+    }
+
+    private Claims getClaims(String token) {
+        try {
+            return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+        } catch (JwtException ex) {
+            throw new IllegalArgumentException("Invalid JWT token", ex);
+        }
+    }
+}
