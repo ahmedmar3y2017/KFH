@@ -21,4 +21,11 @@ public class StudentCourseController {
         studentCourseService.allocateCourses(request);
         return ResponseEntity.ok("Student successfully allocated to selected courses");
     }
+    // JWT Swagger Auth
+    @SecurityRequirement(name = "Authorization")
+    @PutMapping("/update")
+    public ResponseEntity<String> updateStudentCourses(@RequestBody StudentCourseRequest request) {
+        studentCourseService.updateCoursesForStudent(request);
+        return ResponseEntity.ok("Student courses updated successfully");
+    }
 }
