@@ -5,6 +5,7 @@ import com.kfh.services.CourseService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -19,5 +20,12 @@ public class CourseController {
     @GetMapping
     public List<CourseDto> getAllCourses() {
         return courseService.getAllCourses();
+    }
+    // using reactive
+    // JWT Swagger Auth
+    @SecurityRequirement(name = "Authorization")
+    @GetMapping("/reactive")
+    public Flux<CourseDto> getAllCoursesReactive() {
+        return courseService.getAllCoursesReactive();
     }
 }

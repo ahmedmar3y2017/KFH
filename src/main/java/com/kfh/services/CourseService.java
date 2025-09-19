@@ -5,6 +5,8 @@ import com.kfh.mappers.CourseMapper;
 import com.kfh.repos.CourseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 
@@ -20,5 +22,12 @@ public class CourseService {
                 .stream()
                 .map(courseMapper::toDto)
                 .toList();
+    }
+
+    public Flux<CourseDto> getAllCoursesReactive() {
+
+        return Flux.fromIterable(courseRepository.findAll())
+                .map(courseMapper::toDto)
+                .subscribeOn(Schedulers.boundedElastic());
     }
 }
